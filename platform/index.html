@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=1180, viewport-fit=cover">
 <title>منصة أثر — الجانب الآخر من التطبيق</title>
 <meta name="description" content="نموذج تجريبي لمنصة أثر على شاشة الحاسوب: ما يراه المجلس، وكيف يقرر ويراقب، وكيف يساعد الذكاء الاصطناعي. جائزة الشارقة للعمل التطوعي.">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAwFBMVEVcAABhAwMAAADSt7FqFhWod3J1JyaKR0XJqaS8lJCUV1S1iYXm18+COjjFopzawrt6AADBnJeia2fu4tt8MzLdycKwgn1VAABdAACdZWJbAABgAACbYV1gAADgzcby6eL59OxfAABeAABhAABgAABgAACGQT5wIB8+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC1T+mGAAAAQHRSTlP+/gD/////////////////Bf///////wm2/yre/6////9Dmj9Cl////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqT0WAQAAA51JREFUeNqtV9ly4zgMBAWANynrjJVRbM+V2f//wgVlJ1X7MLIiLavCB0fdxNEASKjKOp2q6tfvN9i43n7/umNkwYKvqu9npdRWAvn0/H2B3Qleqpe37egPjjeB3QleqtdvX4QvFN9eC0OxYBf+zlAITqd9+MIggYSX6rwTLwzn6gWqn7vxwvCzgtP5CMH5BK8H8MLwCj+OEfyALR6oFR/WkdTrpGm3eTCiizki8j6hgb+SCdrNTfyzC59uBgYKnqeoQX2p0Jaw+ZuHplVI1nQXDfBFN6i5GuAMzidnmK/TvQ1swjoPOnRIwAgGIafA/5g4eLXR9Yx1HGwCyhn+XChZkDQAtDFa9k+DoaC1OQkUuG5B1wZq7Udo0ABotnUJxvrSHetac20DgRd8wzCghmSRe/n3Oz4jQPGYBnAOdLYErgFuTc3l/IzWNtGvOaHAXBxgL6Gz1sqn1oG5CTpg6Jc0UBrWg4DkPNWSCIoAs4ShR+2shG6W851z1tlVE+BiCCF42bixDcn5g2zYmCIN3WttHK7nQNwvHLIV/TZXPxYNCcwG5tE1oY1pVYAdpQaslq3xi5pANDSX9CRv3pPhwa5nEmcQ81vZ5puoaSmM6RIzC3xm667hiY4kf5beXTEi3gtI/lLsLYZusiMMaTWGqujfJW1lo0gfP84IYwILbNST1iBNpIZgyMqmov4M7Qer+WT9K8G0ZOBOQHsIRmkBpDM0mqL6j1mqCOTTrL8SNGMfMw42OlcOezSnCC1LYiaGaNYLOl0x+J5E9IYxSkWWHGCMOmXIWiyTRKi1CEQ2nkNwQVqH1EEnwm+6AP5xPirxZj2EwbHpdW/YljZkOjeIGnVzuRdImKBbV/LFG99yW86nESegm5js0IdHjUo03aoPUvit9/MowtPSFcUeWNpJ20FgNcDIvB5FbXtjUpkCHjNJW5EUaqnnwKF0x9Jgn6QxRGZnlwYwI1s5n6SlSmXHkQYa2T1JI5DtywfSACQBnREQ4NLTWscaNboneJmIMUaclDiTewvWlAK/d9UOzWC3jBZKXHeuDGcvUyWzVKgumnAy6TdP2UVDWWftM0gkwHWiSkhb8eUr37kmZVUr6fEUS297TO3NI56ibScZawORiBnU1y8Y7DhluWBADPtuOG1Ezr1cMBD2LeVHGfV1bnZf07ZdSlYumg/0ahs/H7/qHr5sH77uH35wHH/yHH10HX/2/Q8Pz6NP3+OP70PP/38BRFAvZiVlEq4AAAAASUVORK5CYII=">
@@ -110,11 +110,20 @@ h1,h2,h3,p{margin:0}
 #app.simple .wrap.screenw{grid-template-columns:230px 1fr 380px !important}
 #app.simple .wrap.monw .alertsCard{grid-column:1 / -1 !important}
 .span{grid-column:1 / -1 !important}
+/* landscape: wider screens spread horizontally */
+@media (min-width:1500px){.recs{grid-template-columns:1fr 1fr 1fr}.tiles{grid-template-columns:repeat(6,1fr)}.home{grid-template-columns:1fr 320px}}
+#rotate{position:fixed;inset:0;z-index:90;background:#23395B;color:#F3EDE4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+#rotate .ph{width:170px;height:300px;border:10px solid #F3EDE4;border-radius:36px;animation:rot 2.2s ease-in-out infinite;position:relative}
+#rotate .ph:after{content:"";position:absolute;left:50%;bottom:20px;width:46px;height:10px;background:#F3EDE4;border-radius:5px;transform:translateX(-50%)}
+@keyframes rot{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+#rotate b{font-family:'Amiri',serif;font-size:76px}
+#rotate p{font-size:38px;color:#D5DEEA;max-width:900px;line-height:1.6}
+#rotate .btn{border-color:#F3EDE4;color:#F3EDE4;font-size:34px;padding:18px 36px;border-radius:20px;border-width:3px}
 /* app chrome */
 .top{position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 24px;background:var(--card);border-bottom:1px solid var(--line)}
 .top img{height:40px}
 .top .brand{display:flex;flex-direction:column;gap:1px;line-height:1.2}
-.top .brand b{font-family:'Amiri',serif;font-size:21px;color:var(--maroon)}
+.top .brand b{font-family:'Amiri',serif;font-size:21px;color:var(--maroon);white-space:nowrap}
 .top .brand span{font-size:11.5px;color:var(--muted);white-space:nowrap}
 .top nav{display:flex;gap:3px;margin-inline-start:14px}
 .top nav button{padding:8px 11px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--ink2);border:0;background:transparent;white-space:nowrap}
@@ -328,6 +337,7 @@ input[type=range]{accent-color:var(--maroon);width:100%}
 .aihelp div{background:#F6F0E6;border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.6}
 .aihelp div b{display:block;color:var(--maroon);margin-bottom:2px}
 .aihelp div em{display:block;font-style:normal;color:var(--navy);font-weight:700;font-size:12px;margin-top:4px}
+@media (max-width:1200px){.top{gap:10px;padding:0 16px}.top nav{margin-inline-start:6px}.top nav button{padding:8px 7px;font-size:11.5px}.top .brand b{font-size:19px}#aiBtn{display:none}}
 @media (max-width:1380px){.top .brand span{display:none}.top nav button{padding:8px 9px;font-size:12px}.top .user{gap:6px}.top .user .btn{padding:5px 8px;font-size:11.5px}}
 @media print{body{min-width:0}.top,.filters,.foot,#guide,#tour,#toast,.noprint{display:none !important}.wrap{padding:0}.rep{border:0;max-width:none}}
 </style>
@@ -397,6 +407,7 @@ input[type=range]{accent-color:var(--maroon);width:100%}
 <div id="tour" class="hidden"></div>
 <div id="modal" class="hidden"><div class="box" id="modalBox"></div></div>
 <div id="toast"></div>
+<div id="rotate" class="hidden"><div class="ph"></div><b>أدر الهاتف أفقيًا</b><p>المنصة مصممة للشاشة العريضة (كما يراها المجلس على الحاسوب). أدر هاتفك إلى الوضع الأفقي لتظهر كاملة.</p><button class="btn" onclick="S.forcePortrait=true;fit()">متابعة في الوضع الرأسي</button></div>
 
 <script>
 /* =============== DATA (كل الأرقام توضيحية) =============== */
@@ -795,6 +806,10 @@ function showTour(){const t=document.getElementById('tour'); const i=S.tourStep;
 function hideTour(){S.tourStep=-1; save(); document.getElementById('tour').classList.add('hidden');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();}});
 /* restore app state if the user was inside */
+/* landscape fit: scale the 1180px design to the device width, ask phones to rotate */
+function fit(){const portrait=matchMedia('(orientation: portrait)').matches; const small=Math.min(screen.width||9999,screen.height||9999)<700; const touch=matchMedia('(pointer: coarse)').matches; const r=document.getElementById('rotate'); r.classList.toggle('hidden',!(portrait&&small&&touch&&!S.forcePortrait));}
+window.addEventListener('resize',fit); window.addEventListener('orientationchange',()=>setTimeout(fit,150)); fit();
+document.getElementById('loginForm').addEventListener('submit',()=>{try{if(screen.orientation&&screen.orientation.lock&&window.innerWidth<900) screen.orientation.lock('landscape').catch(()=>{});}catch(e){}});
 if(location.hash==='#app'&&S.user){enter(false);}
 </script>
 </body>
