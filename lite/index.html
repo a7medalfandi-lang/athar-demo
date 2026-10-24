@@ -67,6 +67,12 @@ a{color:inherit;text-decoration:none}
 .opp b{font-size:calc(16px * var(--fs));color:var(--ink);line-height:1.35;display:block}
 .opp span{font-size:calc(13.5px * var(--fs));color:var(--muted)}
 .opp.joined{border-inline-start-color:var(--ok)}
+.pager{position:fixed;left:0;right:0;bottom:calc(86px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:21}
+.pager .in{width:100%;max-width:430px;display:flex;justify-content:space-between;padding:0 12px}
+.pager button{pointer-events:auto;width:42px;height:42px;border-radius:50%;border:1px solid rgba(94,0,0,.25);background:rgba(251,248,243,.94);color:var(--maroon);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(35,57,91,.18);padding:0}
+.pager button:active{transform:scale(.94)}
+.pager svg{width:22px;height:22px}
+.pager button:disabled{opacity:.35}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;pointer-events:none;z-index:20}
 .nav .in{pointer-events:auto;width:100%;max-width:430px;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 10px calc(10px + env(safe-area-inset-bottom,0px))}
 @media (min-width:500px){.nav .in{border-radius:0 0 30px 30px}}
@@ -199,6 +205,7 @@ input.text:focus{outline:0;border-color:var(--maroon)}
   <section class="screen" id="s-thanks"></section>
   <section class="screen" id="s-quests"></section>
 
+  <div class="pager" id="pager" hidden><div class="in"><button type="button" id="pgPrev" aria-label="الصفحة السابقة" onclick="page(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button><button type="button" id="pgNext" aria-label="الصفحة التالية" onclick="page(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button></div></div>
   <nav class="nav" id="nav" hidden><div class="in">
     <button data-tab="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg><span>فرص</span></button>
     <button data-tab="pass" onclick="go('pass')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17c.8-1.8 2.2-2.6 4-2.6s3.2.8 4 2.6"/></svg><span>جوازي</span></button>
@@ -259,8 +266,11 @@ function unlocked(){return full()||S.done>=3;}
 
 /* ---------- routing ---------- */
 let current='login';
-function show(name){ $$('.screen').forEach(s=>s.classList.toggle('on',s.id==='s-'+name)); current=name; const tabs={home:'home',opp:'home',checkin:'home',pass:'pass',me:'me',group:'me',learn:'me',thanks:'me',quests:'me'}; const t=tabs[name]; $('#nav').hidden=!t; $$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t)); document.body.classList.toggle('big',!!S.big||isSenior()); window.scrollTo(0,0); const r={home:renderHome,opp:renderOpp,checkin:renderCheckin,pass:renderPass,me:renderMe,group:renderGroup,learn:renderLearn,thanks:renderThanks,quests:renderQuests,age:renderAge,int:renderInt,av:renderAv}[name]; if(r) r(); $('#demoBadge').hidden=!S.demo; if(S.demo) $('#demoBadge').textContent='تجربة كـ '+AGES.find(a=>a.id===S.age).t.split(' ·')[0]; }
+function show(name){ $$('.screen').forEach(s=>s.classList.toggle('on',s.id==='s-'+name)); current=name; const tabs={home:'home',opp:'home',checkin:'home',pass:'pass',me:'me',group:'me',learn:'me',thanks:'me',quests:'me'}; const t=tabs[name]; $('#nav').hidden=!t; $('#pager').hidden=!t; $$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t)); document.body.classList.toggle('big',!!S.big||isSenior()); window.scrollTo(0,0); const r={home:renderHome,opp:renderOpp,checkin:renderCheckin,pass:renderPass,me:renderMe,group:renderGroup,learn:renderLearn,thanks:renderThanks,quests:renderQuests,age:renderAge,int:renderInt,av:renderAv}[name]; if(r) r(); $('#demoBadge').hidden=!S.demo; if(S.demo) $('#demoBadge').textContent='تجربة كـ '+AGES.find(a=>a.id===S.age).t.split(' ·')[0]; }
 function go(name){S.step=name; save(); show(name);}
+function pageOrder(){const o=['home','pass','me']; if(unlocked()){o.push('learn'); if(!isKid()) o.push('group','thanks','quests');} return o;}
+function page(dir){const o=pageOrder(); let i=o.indexOf(current); if(i<0) i=0; else i=(i+dir+o.length)%o.length; buzz(6); go(o[i]);}
+document.addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea,select')) return; if($('#pager').hidden) return; if(e.key==='ArrowLeft') page(1); else if(e.key==='ArrowRight') page(-1);});
 
 /* ---------- onboarding ---------- */
 function login(){buzz(10); toast('تم التحقق من هويتك الرقمية (محاكاة)'); setTimeout(()=>go('age'),600);}
