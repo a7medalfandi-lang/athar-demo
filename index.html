@@ -506,6 +506,7 @@ select.text{width:100%;min-height:44px;border:1px solid var(--line);border-radiu
         <div class="row" style="justify-content:space-between"><h2 class="sec">فرص تناسبك</h2><a href="#opp" class="small" style="font-weight:700;color:var(--maroon)">عرض الكل</a></div>
         <div id="oppList" class="col" style="gap:8px"></div>
       </section>
+      <button type="button" class="btn outline block" id="btnSignOut2" style="min-height:48px;margin-top:4px;margin-bottom:56px"><svg class="ico s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>تسجيل الخروج</span></button>
     </main>
   </section>
 
@@ -2595,7 +2596,8 @@ select.text{width:100%;min-height:44px;border:1px solid var(--line);border-radiu
     b.disabled = true; $('#uaeLabel').innerHTML = '<span class="spin" aria-hidden="true"></span> جارٍ التحقق عبر UAE PASS…';
     setTimeout(() => { b.disabled = false; $('#uaeLabel').textContent = 'الدخول بالهوية الرقمية UAE PASS'; buzz(16); go(S.avatarChosen ? 'home' : 'avatar'); }, reduced ? 300 : 1300);
   });
-  $('#btnSignOut').addEventListener('click', () => { if (!confirm('تسجيل الخروج من أثر؟ تبقى شخصيتك وإعداداتك محفوظة على هذا الجهاز.')) return; S.mode = 'volunteer'; save(); buzz(10); go('login'); setTimeout(() => toast('تم تسجيل الخروج'), 300); });
+  const signOut = () => { if (!confirm('تسجيل الخروج من أثر؟ تبقى شخصيتك وإعداداتك محفوظة على هذا الجهاز.')) return; S.mode = 'volunteer'; save(); buzz(10); go('login'); setTimeout(() => toast('تم تسجيل الخروج'), 300); };
+  $('#btnSignOut').addEventListener('click', signOut); $('#btnSignOut2').addEventListener('click', signOut);
   $('#btnNick').addEventListener('click', () => { S.customNick = ''; $('#nickInput').value = ''; S.place = (S.place + 1) % PLACES.length; save(); $('#nickPreview').textContent = nickname(); });
   const onNick = (e) => { const raw = e.target.value; const v = cleanNick(raw); if (/[\d٠-٩]{4,}/.test(raw)) toast('بلا أرقام هاتف في الاسم المستعار'); S.customNick = v; save(); $('#nickPreview').textContent = nickname(); const o = e.target.id === 'nickInput' ? $('#nickInput2') : $('#nickInput'); if (o) o.value = v; if ($('#moreNick')) $('#moreNick').textContent = nickname(); };
   $('#nickInput').addEventListener('input', onNick); $('#nickInput2').addEventListener('input', onNick);
