@@ -246,7 +246,7 @@ const QUESTS=[['أكمل أول 3 فرص','تفتح لك المجموعات وا
 
 /* ---------- state ---------- */
 const KEY='athar-lite-v1';
-const fresh=()=>({step:'login',age:null,ints:[],av:null,nick:'',place:0,mode:'simple',big:false,joined:null,checked:false,hours:0,entries:[],done:0,thanks:[],lesson:{},demo:null,notif:true,showRank:true});
+const fresh=()=>({step:'login',age:null,ints:[],av:null,nick:'',place:0,mode:'simple',big:false,joined:null,checked:false,hours:0,entries:[],done:0,thanks:[],lesson:{},demo:null,notif:true,showRank:true,kids:[]});
 let S=load(); function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.step) return Object.assign(fresh(),s);}catch(e){} return fresh();}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=(q,r=document)=>r.querySelector(q); const $$=(q,r=document)=>Array.from(r.querySelectorAll(q));
@@ -361,7 +361,43 @@ function renderPass(){const {s,i}=stationOf(S.hours); const next=STATIONS[i+1]; 
    <h2 class="h2" style="font-size:calc(20px * var(--fs))">آخر الساعات المعتمدة</h2>
    <div class="list">${(S.entries.concat([{t:'قراءة قصص للأطفال في المكتبة',org:'مكتبات الشارقة العامة',h:1.5,d:'الأسبوع الماضي',demo:true}])).slice(0,6).map(e=>`<div class="item"><span class="ic" style="background:var(--oks)"><svg viewBox="0 0 24 24" fill="none" stroke="#1F6F43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="col grow" style="gap:0"><b>${e.t}</b><span>اعتمدتها ${e.org} · ${e.d}</span></span><span class="tag ok">${e.h} س</span></div>`).join('')}</div>
    ${S.entries.length===0?'<p class="xs muted">السطر الأعلاه مثال توضيحي؛ أكمل فرصتك الأولى لتظهر ساعاتك هنا.</p>':''}
-   <div class="row" style="gap:8px"><button class="btn sm outline" onclick="toast('نُسخ رابط التحقق من جوازك (محاكاة)')">شارك جوازي</button><button class="btn sm outline" onclick="toast('أُنشئ ملف PDF لجوازك (محاكاة)')">PDF</button></div>`;}
+   <div class="row" style="gap:8px"><button class="btn sm outline" onclick="toast('نُسخ رابط التحقق من جوازك (محاكاة)')">شارك جوازي</button><button class="btn sm outline" onclick="toast('أُنشئ ملف PDF لجوازك (محاكاة)')">PDF</button></div>
+   ${isKid()?'':`<h2 class="h2" style="font-size:calc(20px * var(--fs));margin-top:6px">أطفالي تحت جوازي</h2>
+   <p class="sub" style="font-size:calc(13.5px * var(--fs))">لمن هم دون 18 ولا يملكون هوية رقمية: يُسجَّلون ببطاقة الهوية تحت جوازك، وتُحتسب ساعاتهم باسمهم، ولا يظهرون في أي ترتيب عام.</p>
+   <div class="list">${(S.kids||[]).map((k,i)=>`<div class="card" style="gap:6px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div class="col" style="gap:0"><b style="font-size:calc(16px * var(--fs))">${esc(k.name)}</b><span class="xs muted">${k.age} سنة · ${k.sex} · <span dir="ltr">${eidMask(k.eid)}</span>${k.school?' · '+esc(k.school):''}</span>${k.note?`<span class="xs" style="color:#7A5200">ملاحظة للمشرف: ${esc(k.note)}</span>`:''}</div><span class="tag ok">${k.hours} س</span></div><div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" onclick="kidQr(${i})">رمز حضور الطفل</button><button class="btn sm outline" onclick="kidForm(${i})">تعديل</button><button class="btn sm outline" onclick="kidDel(${i})">حذف</button></div></div>`).join('')}</div>
+   <button class="btn outline" onclick="kidForm(-1)">+ تسجيل طفل ببطاقة الهوية</button>`}`;}
+/* ---------- kids under the guardian's passport ---------- */
+function kidAge(dob){if(!dob) return null; const d=new Date(dob); if(isNaN(d)) return null; const n=new Date(); let a=n.getFullYear()-d.getFullYear(); const m=n.getMonth()-d.getMonth(); if(m<0||(m===0&&n.getDate()<d.getDate())) a--; return a;}
+const eidDigits=v=>String(v||'').replace(/\D/g,'').slice(0,15);
+const eidFmt=v=>{const d=eidDigits(v); return [d.slice(0,3),d.slice(3,7),d.slice(7,14),d.slice(14)].filter(Boolean).join('-');};
+const eidOk=v=>{const d=eidDigits(v); return d.length===15&&d.startsWith('784');};
+const eidMask=v=>{const d=eidDigits(v); return '784-••••-•••'+d.slice(10,14)+'-'+d.slice(14);};
+let kidIdx=-1;
+function kidForm(i){kidIdx=i; const k=i>=0?S.kids[i]:null;
+  sheet(`<h2 class="h2">${k?'تعديل بيانات الطفل':'تسجيل طفل تحت جوازي'}</h2><p class="sub" style="font-size:calc(13.5px * var(--fs))">للأطفال دون 18 الذين لا يملكون هوية رقمية. بياناتهم للجائزة والجهة فقط.</p>
+   <label class="xs muted">الاسم الكامل كما في بطاقة الهوية</label><input class="text" id="kName" value="${esc(k?k.name:'')}" maxlength="60">
+   <label class="xs muted">رقم بطاقة الهوية الإماراتية</label><input class="text" id="kEid" value="${k?eidFmt(k.eid):''}" placeholder="784-XXXX-XXXXXXX-X" inputmode="numeric" maxlength="18" dir="ltr" style="text-align:left" oninput="this.value=eidFmt(this.value)">
+   <div class="row" style="gap:10px;align-items:flex-end"><div class="col grow"><label class="xs muted">تاريخ الميلاد</label><input class="text" id="kDob" type="date" value="${k?k.dob:''}" onchange="const a=kidAge(this.value);document.getElementById('kAge').textContent=a===null?'—':a+' سنة'"></div><div class="col" style="width:90px"><span class="xs muted">العمر</span><b id="kAge" style="min-height:50px;display:flex;align-items:center">${k?k.age+' سنة':'—'}</b></div></div>
+   <span class="xs muted">الجنس</span><div class="seg" id="kSex"><button class="${!k||k.sex==='ذكر'?'on':''}" data-v="ذكر" onclick="segPick(this)">ذكر</button><button class="${k&&k.sex==='أنثى'?'on':''}" data-v="أنثى" onclick="segPick(this)">أنثى</button></div>
+   <span class="xs muted">صلة ولي الأمر</span><div class="seg" id="kRel">${['أب','أم','وصي'].map(r=>`<button class="${(k?k.rel:'أب')===r?'on':''}" data-v="${r}" onclick="segPick(this)">${r}</button>`).join('')}</div>
+   <label class="xs muted">المدرسة (اختياري)</label><input class="text" id="kSchool" value="${esc(k?k.school||'':'')}" maxlength="60">
+   <label class="xs muted">ملاحظة صحية أو حساسية يعرفها المشرف (اختياري)</label><input class="text" id="kNote" value="${esc(k?k.note||'':'')}" maxlength="80">
+   <label class="toggle" style="cursor:pointer"><span class="sub" style="font-size:calc(13.5px * var(--fs))">أوافق بصفتي ولي الأمر على تسجيل ساعات طفلي بإشراف الجهة، وأن تبقى بياناته للجهة والجائزة فقط</span><input type="checkbox" id="kConsent" ${k?'checked':''} style="width:24px;height:24px;accent-color:var(--maroon);flex:none"></label>
+   <p class="xs" id="kErr" style="color:#8B1E1E;min-height:1em"></p>
+   <button class="btn" onclick="kidSave()">حفظ</button>`);}
+function segPick(b){const seg=b.parentElement; seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));}
+function kidSave(){const name=$('#kName').value.trim(); const eid=$('#kEid').value; const dob=$('#kDob').value; const age=kidAge(dob); const err=$('#kErr');
+  if(name.split(/\s+/).filter(Boolean).length<2){err.textContent='اكتب الاسم الكامل كما في بطاقة الهوية (اسمين على الأقل)';return;}
+  if(!eidOk(eid)){err.textContent='رقم بطاقة الهوية 15 رقمًا ويبدأ بـ 784';return;}
+  if(age===null){err.textContent='اختر تاريخ الميلاد';return;}
+  if(age>=18){err.textContent='هذا القسم لمن هم دون 18؛ من بلغ 18 يسجّل بهويته الرقمية';return;}
+  if(age<4){err.textContent='الحد الأدنى للتسجيل 4 سنوات';return;}
+  if(!$('#kConsent').checked){err.textContent='موافقة ولي الأمر مطلوبة';return;}
+  const sex=$('#kSex .on').dataset.v, rel=$('#kRel .on').dataset.v; const k={name,eid:eidDigits(eid),dob,age,sex,rel,school:$('#kSchool').value.trim(),note:$('#kNote').value.trim(),hours:0};
+  S.kids=S.kids||[]; if(kidIdx>=0){k.hours=S.kids[kidIdx].hours; S.kids[kidIdx]=k;} else S.kids.push(k); save(); closeSheet(); buzz(12); renderPass(); toast(kidIdx>=0?'حُدّثت بيانات الطفل':'سُجّل '+name.split(' ')[0]+' تحت جوازك');}
+function kidDel(i){if(confirm('حذف '+S.kids[i].name+' من جوازك؟')){S.kids.splice(i,1); save(); renderPass(); toast('حُذف');}}
+function kidQr(i){const k=S.kids[i]; sheet(`<h2 class="h2 center">${esc(k.name)}</h2><p class="sub center">براعم · ${k.age} سنة · ولي الأمر: ${esc(nick())} (${k.rel})</p><div class="qr">${qrSvg(1000+i*7+Math.floor(Date.now()/60000))}<span class="xs muted">يعرضه ولي الأمر للمشرف أو المدرسة · يتجدد كل 60 ثانية</span></div><button class="btn navy" onclick="kidApprove(${i})">محاكاة اعتماد الجهة لساعتين</button><p class="xs muted center">في النسخة الفعلية يمسح المشرف الرمز؛ هذا الزر للعرض فقط</p>`);}
+function kidApprove(i){closeSheet(); const k=S.kids[i]; toast('أُرسل طلب الاعتماد إلى '+(k.school||'الجهة المشرفة')+'…'); setTimeout(()=>{k.hours=+(k.hours+2).toFixed(1); save(); renderPass(); buzz([20,40,20]); confetti(); toast('اعتُمدت ساعتان لـ '+k.name.split(' ')[0]+' تحت جوازك');},1500);}
 
 /* ---------- me ---------- */
 function renderMe(){const a=AGES.find(x=>x.id===S.age)||AGES[2]; const un=unlocked();
